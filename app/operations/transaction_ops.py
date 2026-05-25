@@ -1,10 +1,8 @@
-from app.database.connection import SessionLocal
+from sqlalchemy.orm import Session
 
 from app.models.transaction import Transaction
 
-def create_transaction(customer_name, invoice_number, amount, status):
-
-    db = SessionLocal()
+def create_transaction(db: Session, customer_name, invoice_number, amount, status):
 
     new_transaction = Transaction(customer_name=customer_name, invoice_number=invoice_number, amount=amount, status=status)
 
@@ -14,45 +12,32 @@ def create_transaction(customer_name, invoice_number, amount, status):
 
     db.refresh(new_transaction)
 
-    db.close()
-
     return new_transaction
 
-def get_all_transactions():
+def get_all_transactions(db: Session, skip: int = 0, limit: int = 10):
 
-    db = SessionLocal()
-
-    transactions = db.query(Transaction).all()
-
-    db.close()
+    transactions = db.query(Transaction)\
+        .offset(skip)\
+            .limit(limit)\
+                .all()
 
     return transactions
 
-def get_transaction_by_id(transaction_id):
-
-    db = SessionLocal()
+def get_transaction_by_id(db: Session, transaction_id):
 
     transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
 
-    db.close()
-
     return transaction
 
-def update_transactions(transaction_id, customer_name, amount, status):
-
-    db = SessionLocal()
+def update_transactions(db: Session, transaction_id, customer_name, amount, status):
 
     transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
 
     if not transaction:
 
-        db.close()
-
         return None
     
     if amount <= 0:
-
-        db.close()
 
         return None
     
@@ -65,8 +50,6 @@ def update_transactions(transaction_id, customer_name, amount, status):
     db.commit()
 
     db.refresh(transaction)
-
-    db.close()
 
     return transaction
 
