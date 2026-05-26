@@ -1,6 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
 from fastapi import Depends
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 from app.operations.transaction_ops import (create_transaction, get_all_transactions, get_transaction_by_id, update_transactions)
 
@@ -12,7 +12,7 @@ from app.database.connection import get_db
 
 router = APIRouter()
 
-@router.post("/transactions")
+@router.post("/transactions",status_code=status.HTTP_201_CREATED)
 def create_transaction_route(customer_name: str, invoice_number: str, amount: float, status: str, db: Session = Depends(get_db)):
 
     try:
@@ -26,7 +26,9 @@ def create_transaction_route(customer_name: str, invoice_number: str, amount: fl
         raise HTTPException(status_code=500, detail="Database operation failed")
 
 @router.get("/transactions")
-def fetch_all_transactions(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+def fetch_all_transactions(response: Response, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+
+    response.headers["X-API-Version"] = "1.0"
 
     transactions = get_all_transactions(db, skip, limit)
 
@@ -44,9 +46,9 @@ def fetch_transaction(transaction_id: int, db: Session = Depends(get_db)):
     return transaction
 
 @router.put("/transactions/{transaction_id}")
-def update_transaction_route(transcation_id: int, customer_name: str, amount: float, status: str, db: Session = Depends(get_db)):
+def update_transaction_route(transaction_id: int, customer_name: str, amount: float, status: str, db: Session = Depends(get_db)):
 
-    transaction = update_transactions(db, transcation_id, customer_name, amount, status)
+    transaction = update_transactions(db, transaction_id, customer_name, amount, status)
 
     if not transaction: 
 
