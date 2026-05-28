@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 
 from app.database.connection import engine
 from app.database.connection import Base
@@ -8,6 +8,8 @@ from app.models.transaction import Transaction
 from app.api.transaction_routes import router
 
 from app.services.jwt_service import (create_access_token, decode_access_token)
+
+from app.middleware.auth_middleware import get_current_user
 
 
 app = FastAPI()
@@ -21,4 +23,3 @@ Base.metadata.create_all(bind=engine)
 def home():
 
     return {"message": "Transaction Processing API Running"}
-
