@@ -11,8 +11,12 @@ from app.services.jwt_service import (create_access_token, decode_access_token)
 
 from app.middleware.auth_middleware import get_current_user
 
+from app.core.logger import logger
+
 
 app = FastAPI()
+
+logger.info("Application initialized")
 
 app.include_router(router)
 
