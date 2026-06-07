@@ -1,13 +1,17 @@
-from sqlalchemy import Column
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy import Numeric
-from sqlalchemy import DateTime
-from sqlalchemy import CheckConstraint
+from sqlalchemy import Column, Integer, String, Numeric, DateTime, CheckConstraint, Enum
 
 from datetime import datetime
 
 from app.database.connection import Base
+
+import enum
+
+class TransactionStatus(enum.Enum):
+
+    PENDING = "PENDING"
+    VALIDATED = "VALIDATED"
+    FAILED = "FAILED"
+    COMPLETED = "COMPLETED"
 
 class Transaction(Base):
 
@@ -21,7 +25,7 @@ class Transaction(Base):
 
     amount = Column(Numeric, nullable=False)
 
-    status = Column(String, default="PENDING", nullable=False)
+    status = Column(Enum(TransactionStatus), nullable=False, default=TransactionStatus.PENDING)
 
     created_at = Column(DateTime, default=datetime.utcnow)
 

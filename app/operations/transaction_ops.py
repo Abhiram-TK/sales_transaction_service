@@ -12,10 +12,6 @@ def create_transaction(db: Session, customer_name, invoice_number, amount):
 
     db.refresh(new_transaction)
 
-    from app.workers.transaction_tasks import (validate_transaction)
-
-    validate_transaction.delay(new_transaction.id)
-
     return new_transaction
 
 def get_all_transactions(db: Session, skip: int = 0, limit: int = 10):

@@ -1,6 +1,14 @@
 from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict
+from enum import Enum
+
+class TransactionStatus(str, Enum):
+
+    PENDING = "PENDING"
+    VALIDATED = "VALIDATED"
+    FAILED = "FAILED"
+    COMPLETED = "COMPLETED"
 
 class TransactionCreate(BaseModel):
 
@@ -21,8 +29,10 @@ class TransactionResponse(BaseModel):
     customer_name: str
     invoice_number: str
     amount: float
-    status: str
+    status: TransactionStatus   
     created_at: datetime
+    updated_at: datetime | None = None
+    validated_at: datetime | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
