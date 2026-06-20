@@ -2,7 +2,8 @@ from fastapi import FastAPI, Depends
 
 from sqlalchemy import text
 
-from app.api.transaction_routes import router
+from app.api.product_routes import router as product_router
+from app.api.transaction_routes import transaction_router
 
 from app.core.logger import logger
 
@@ -16,11 +17,13 @@ from app.services.jwt_service import decode_access_token
 
 tags_metadata = [
 
-    {"name": "Transactions", "description": "Transaction creation, retrieval, updates and business workflow processing."},
+    {"name": "System", "description": "Service information and health monitoring."},
 
-    {"name": "System", "description": "Service information and health monitoring."}]
+    {"name": "Products", "description": "Product catalog retrieved from Inventory Service."},
+    
+    {"name": "Transactions", "description": "Sales transaction processing and lifecycle management."}]
 
-app = FastAPI(title="Transaction Processing API", version="1.0.0", description=
+app = FastAPI(title="Sales Transaction Service", version="1.0.0", description=
               
               """Enterprise transaction management platform.
 
@@ -36,7 +39,8 @@ app = FastAPI(title="Transaction Processing API", version="1.0.0", description=
 
 logger.info("Application initialized")
 
-app.include_router(router)
+app.include_router(product_router)
+app.include_router(transaction_router)
 
 Base.metadata.create_all(bind=engine)
 

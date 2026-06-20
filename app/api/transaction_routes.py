@@ -24,9 +24,9 @@ request_tracker = {}
 RATE_LIMIT = 5
 TIME_WINDOW = 60
 
-router = APIRouter(tags=["Transactions"])
+transaction_router = APIRouter(tags=["Transactions"])
 
-@router.post("/transactions",status_code=status.HTTP_201_CREATED, response_model=TransactionResponse, dependencies=[Depends(PermissionChecker(["create_transactions"]))],
+@transaction_router.post("/transactions",status_code=status.HTTP_201_CREATED, response_model=TransactionResponse, dependencies=[Depends(PermissionChecker(["create_transactions"]))],
              summary="Create Transaction", description="""
              Create a new financial transaction.
              
@@ -95,7 +95,7 @@ def create_transaction_route(request: Request, response: Response, transaction: 
         raise HTTPException(status_code=500, detail="Database operation failed")
         
 
-@router.get("/transactions", response_model=list[TransactionResponse], dependencies=[Depends(RoleChecker(["admin", "recruiter", "viewer", "manager", "support", "auditor"]))],
+@transaction_router.get("/transactions", response_model=list[TransactionResponse], dependencies=[Depends(RoleChecker(["admin", "recruiter", "viewer", "manager", "support", "auditor"]))],
             summary="Get All Transactions", description="""
              Get all transactions.
              
@@ -116,7 +116,7 @@ def fetch_all_transactions(response: Response, skip: int = 0, limit: int = 10, d
 
     return transactions
 
-@router.get("/transactions/{transaction_id}", response_model=TransactionDetailedResponse, dependencies=[Depends(RoleChecker(["admin", "recruiter", "viewer", "manager",
+@transaction_router.get("/transactions/{transaction_id}", response_model=TransactionDetailedResponse, dependencies=[Depends(RoleChecker(["admin", "recruiter", "viewer", "manager",
             "support", "auditor"]))], summary="Get Transaction By ID", description="""
              Get transaction by ID.
              
@@ -139,7 +139,7 @@ def fetch_transaction(transaction_id: int, db: Session = Depends(get_db)):
 
     return {"transaction": transaction, "metadata": {"api_version": "1.0", "processed_by": "FastAPI Transaction Service", "timestamp": datetime.utcnow()}}
 
-@router.put("/transactions/{transaction_id}", response_model=TransactionResponse, dependencies=[Depends(RoleChecker(["admin", "manager"]))],
+@transaction_router.put("/transactions/{transaction_id}", response_model=TransactionResponse, dependencies=[Depends(RoleChecker(["admin", "manager"]))],
             summary="Update Transaction", description="""
              Update transaction.
              
