@@ -7,8 +7,9 @@ from app.database.connection import get_db
 from app.events.event_emitter import emit_event
 from app.operations.transaction_ops import (create_transaction, get_all_transactions, get_transaction_by_id, update_transactions)
 from app.schemas.transaction_schema import (TransactionCreate, TransactionUpdate, TransactionResponse, TransactionMetadata, TransactionDetailedResponse)
-from app.middleware.auth_middleware import get_current_user
+
 from app.services.rbac_service import RoleChecker
+from app.services.permission_checker import PermissionChecker
 from app.workers.transaction_tasks import validate_transaction
 
 from fastapi import (APIRouter, HTTPException, Request, Response, status, Depends, Header)
@@ -25,7 +26,7 @@ TIME_WINDOW = 60
 
 router = APIRouter(tags=["Transactions"])
 
-@router.post("/transactions",status_code=status.HTTP_201_CREATED, response_model=TransactionResponse, dependencies=[Depends(RoleChecker(["admin", "recruiter", "manager"]))],
+@router.post("/transactions",status_code=status.HTTP_201_CREATED, response_model=TransactionResponse, dependencies=[Depends(PermissionChecker(["create_transactions"]))],
              summary="Create Transaction", description="""
              Create a new financial transaction.
              
@@ -39,7 +40,7 @@ router = APIRouter(tags=["Transactions"])
              - Async validation""")
 
 def create_transaction_route(request: Request, response: Response, transaction: TransactionCreate, idempotency_key: str = Header(...), 
-                             db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+                             db: Session = Depends(get_db)):
     
     client_ip = request.client.host
 
@@ -107,7 +108,7 @@ def create_transaction_route(request: Request, response: Response, transaction: 
              - Rate Limiting
              - Idempotency Protection""")
 
-def fetch_all_transactions(response: Response, skip: int = 0, limit: int = 10, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+def fetch_all_transactions(response: Response, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
 
     response.headers["X-API-Version"] = "1.0"
 
@@ -128,7 +129,7 @@ def fetch_all_transactions(response: Response, skip: int = 0, limit: int = 10, d
              - Rate Limiting
              - Idempotency Protection""")
 
-def fetch_transaction(transaction_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+def fetch_transaction(transaction_id: int, db: Session = Depends(get_db)):
 
     transaction = get_transaction_by_id(db, transaction_id)
 
@@ -152,7 +153,7 @@ def fetch_transaction(transaction_id: int, db: Session = Depends(get_db), curren
              - Rate Limiting
              - Idempotency Protection""")
 
-def update_transaction_route(transaction_id: int, transaction_update: TransactionUpdate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+def update_transaction_route(transaction_id: int, transaction_update: TransactionUpdate, db: Session = Depends(get_db)):
 
     transaction = update_transactions(db, transaction_id, transaction_update.customer_name, transaction_update.amount, transaction_update.status)
 
