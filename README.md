@@ -127,23 +127,60 @@ Reserve Inventory
 ```text
 sales_transaction_service/
 
-├── app/
-│   ├── api/
-│   ├── core/
-│   ├── database/
-│   ├── events/
-│   ├── middleware/
-│   ├── models/
-│   ├── operations/
-│   ├── schemas/
-│   ├── services/
-│   ├── workers/
+├── app
+│   ├── api
+│   │   ├── product_routes.py
+│   │   └── transaction_routes.py
+│   │
+│   ├── core
+│   │   ├── config.py
+│   │   ├── logger.py
+│   │   └── security.py
+│   │
+│   ├── database
+│   │   ├── connection.py
+│   │   └── seed_transactions.py
+│   │
+│   ├── events
+│   │   └── event_emitter.py
+│   │
+│   ├── middleware
+│   │   └── auth_middleware.py
+│   │
+│   ├── models
+│   │   └── transaction.py
+│   │
+│   ├── operations
+│   │   └── transaction_ops.py
+│   │
+│   ├── schemas
+│   │   ├── __init__.py
+│   │   ├── product_schema.py
+│   │   └── transaction_schema.py
+│   │
+│   ├── services
+│   │   ├── inventory_service.py
+│   │   ├── invoice_service.py
+│   │   ├── jwt_service.py
+│   │   ├── permission_checker.py
+│   │   ├── product_service.py
+│   │   ├── rbac_service.py
+│   │   └── reservation_service.py
+│   │
+│   ├── workers
+│   │   ├── celery_app.py
+│   │   └── transaction_tasks.py
+│   │
 │   └── main.py
 │
 ├── logs/
-├── requirements.txt
+│   └── app.log
+│
+├── .env
 ├── .env.example
-└── README.md
+├── .gitignore
+├── README.md
+└── requirements.txt
 ```
 
 ---
